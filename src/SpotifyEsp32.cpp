@@ -1,4 +1,5 @@
 #include "SpotifyEsp32.h"
+
 namespace Spotify_types {
   bool SHUFFLE_ON = true;
   bool SHUFFLE_OFF = false;
@@ -24,6 +25,40 @@ namespace Spotify_types {
   const char* FOLLOW_TYPE_ARTIST = "artist";
   const char* FOLLOW_TYPE_USER = "user";
 }
+
+Spotify::Spotify() {
+  _retry = 0;
+  _no_credentials = true;  // Indicate that credentials have not been set yet
+  _debug_on = false;
+  _port = 80;  // Default port
+  _max_num_retry = 1;  // Default retry count
+
+  #ifndef DISABLE_WEB_SERVER
+  _server = nullptr;  // Server not initialized
+  #endif
+}
+
+void Spotify::init(const char* client_id, const char* client_secret, const char* refresh_token, int server_port, bool debug_on, int max_num_retry) {
+  _retry = 0;
+  if (!(client_id && client_secret && refresh_token)) {
+    _no_credentials = true;
+  } else {
+    strncpy(_client_id, client_id, sizeof(_client_id));
+    strncpy(_client_secret, client_secret, sizeof(_client_secret));
+    strncpy(_refresh_token, refresh_token, sizeof(_refresh_token));
+    _no_credentials = false;
+  }
+  _debug_on = debug_on;
+  _port = server_port;
+  _max_num_retry = (max_num_retry > 0) ? max_num_retry : 1;
+
+  #ifndef DISABLE_WEB_SERVER
+  if (_server == nullptr) {
+    _server = new WebServer(server_port);
+  }
+  #endif
+}
+
 
 Spotify::Spotify(const char* client_id, const char* client_secret, int server_port, bool debug_on, int max_num_retry){
   _retry = 0;
