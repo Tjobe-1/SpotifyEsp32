@@ -569,9 +569,16 @@ response Spotify::currently_playing(JsonDocument filter){
   snprintf(url, sizeof(url),"%sme/player/currently-playing", _base_url);
   return RestApiGet(url, filter);
 }
-response Spotify::current_playback_state(JsonDocument filter){
-  char url[60];
-  snprintf(url, sizeof(url),"%sme/player", _base_url);
+response Spotify::current_playback_state(int size_of_additional_types, const char** additional_types, JsonDocument filter) {
+  char url[100];
+
+  if (size_of_additional_types == 0) {
+    snprintf(url, sizeof(url), "%sme/player", _base_url);
+  } else {
+    char arr[_max_char_size];
+    snprintf(url, sizeof(url), "%sme/player?additional_types=%s", _base_url, array_to_char(size_of_additional_types, additional_types, arr));
+  }
+
   return RestApiGet(url, filter);
 }
 response Spotify::start_resume_playback(const char* context_uri, int offset, int position_ms, const char* device_id){
@@ -1699,7 +1706,7 @@ bool Spotify::volume_modifyable(){
   bool volume_modifyable = false;
   JsonDocument filter;
   filter["device"]["supports_volume"] = true;
-  response data = current_playback_state(filter);
+  response data = current_playback_state(0, NULL, filter);
   if(valid_http_code(data.status_code) && !data.reply.isNull()){
     volume_modifyable = data.reply["device"]["supports_volume"];
   }

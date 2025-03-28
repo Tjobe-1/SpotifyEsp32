@@ -197,7 +197,7 @@ class Spotify {
     /// @brief get information about the user's current playback state, including track, track progress, and active device, shuffle etc.
     /// @param filter JsonDocument containing the fields to filter(Optional, returns all fields if not provided)
     /// @return response object containing http status code and reply
-    response current_playback_state(JsonDocument filter = JsonDocument());
+    response current_playback_state(int size_of_additional_types, const char** additional_types, JsonDocument filter = JsonDocument());
     /// @brief Get recently played tracks
     /// @param limit The maximum number of items to return. Default: 10. Minimum: 1. Maximum: 50
     /// @param filter JsonDocument containing the fields to filter(Optional, returns all fields if not provided)
